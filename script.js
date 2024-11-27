@@ -22,6 +22,57 @@ const Player = (name, mark) => {
     return { name, mark };
 }
 
+const DisplayController = (() => {
+    const boardElement = document.querySelector(".gameboard");
+    const messageElement = document.querySelector(".message");
+    const restartButton = document.querySelector(".restart");
+
+    const renderBoard = () => {
+        boardElement.innerHTML = "";
+        Gameboard.getBoard().forEach((mark, index) => {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.textContent = mark;
+            if (mark !== "") {
+                cell.classList.add("taken");
+            }
+            cell.addEventListener("click", () => handleClick(index));
+            boardElement.appendChild(cell);
+        });
+    };
+
+    const setMessage = (message) => {
+        messageElement.textContent = message;
+    };
+
+    const handleClick = (index) => {
+        const currentPlayer = GameController.getCurrentPlayer();
+        if (GameController.playTurn(index)) {
+            renderBoard();
+            if (GameController.isGameOver()) {
+                const winner = GameController.getWinner();
+                if (winner) {
+                    setMessage(`🎉 ${winner.name} (${winner.mark}) wins!`);
+                } else {
+                    setMessage("It's a tie! 🤝");
+                }
+            } else {
+                setMessage(`${currentPlayer.name}'s (${currentPlayer.mark}) turn.`);
+            }
+        } else {
+            setMessage("Spot taken! Choose another.");
+        }
+    };
+
+    restartButton.addEventListener("click", () => {
+        GameController.startGame("Player 1", "Player 2");
+        renderBoard();
+        setMessage("Game restarted! Player 1's (X) turn.");
+    });
+
+    return { renderBoard, setMessage };
+})();
+
 const GameController = (() => {
     let players = [];
     let currentPlayerIndex = 0;
