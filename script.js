@@ -46,6 +46,11 @@ const DisplayController = (() => {
     };
 
     const handleClick = (index) => {
+
+        if (GameController.isGameOver()) {
+            return;
+        }
+
         const currentPlayer = GameController.getCurrentPlayer();
         if (GameController.playTurn(index)) {
             renderBoard();
@@ -57,7 +62,8 @@ const DisplayController = (() => {
                     setMessage("It's a tie! 🤝");
                 }
             } else {
-                setMessage(`${currentPlayer.name}'s (${currentPlayer.mark}) turn.`);
+                const nextPlayer = GameController.getCurrentPlayer();
+                setMessage(`${nextPlayer.name}'s (${nextPlayer.mark}) turn.`);
             }
         } else {
             setMessage("Spot taken! Choose another.");
@@ -65,9 +71,10 @@ const DisplayController = (() => {
     };
 
     restartButton.addEventListener("click", () => {
+        restartButton.innerHTML = "Restart Game"
         GameController.startGame("Player 1", "Player 2");
         renderBoard();
-        setMessage("Game restarted! Player 1's (X) turn.");
+        setMessage("Game started! Player 1's (X) turn.");
     });
 
     return { renderBoard, setMessage };
